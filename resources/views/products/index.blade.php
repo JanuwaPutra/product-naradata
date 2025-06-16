@@ -53,10 +53,10 @@
                 </div>
                 <div class="col-auto">
                     <div class="btn-group">
-                        <a href="{{ route('products.export.excel') }}?search={{ request('search') }}" class="btn btn-sm btn-outline-success">
+                        <a href="{{ secure_url(route('products.export.excel', [], false)) }}?search={{ request('search') }}" class="btn btn-sm btn-outline-success">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
-                        <a href="{{ route('products.export.pdf') }}?search={{ request('search') }}" class="btn btn-sm btn-outline-danger">
+                        <a href="{{ secure_url(route('products.export.pdf', [], false)) }}?search={{ request('search') }}" class="btn btn-sm btn-outline-danger">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
                         </a>
                     </div>
@@ -230,8 +230,15 @@
                 </tr>
             `;
             
-            // Make AJAX request
-            fetch(`{{ route('products.index') }}?page=${page}&search=${search}&per_page=${perPage}`, {
+            // Make AJAX request - use current protocol (http/https)
+            const baseUrl = window.location.protocol + '//' + window.location.host;
+            const url = new URL('{{ route('products.index', [], false) }}', baseUrl);
+            const queryParams = new URLSearchParams();
+            queryParams.append('page', page);
+            queryParams.append('search', search);
+            queryParams.append('per_page', perPage);
+            
+            fetch(`${url}?${queryParams.toString()}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -283,11 +290,17 @@
             const pdfLink = document.querySelector('a[href*="products.export.pdf"]');
             
             if (excelLink) {
-                excelLink.href = `{{ route('products.export.excel') }}?search=${search}`;
+                const baseUrl = window.location.protocol + '//' + window.location.host;
+                let url = new URL('{{ route('products.export.excel', [], false) }}', baseUrl);
+                url.searchParams.set('search', search || '');
+                excelLink.href = url.toString();
             }
             
             if (pdfLink) {
-                pdfLink.href = `{{ route('products.export.pdf') }}?search=${search}`;
+                const baseUrl = window.location.protocol + '//' + window.location.host;
+                let url = new URL('{{ route('products.export.pdf', [], false) }}', baseUrl);
+                url.searchParams.set('search', search || '');
+                pdfLink.href = url.toString();
             }
         }
         

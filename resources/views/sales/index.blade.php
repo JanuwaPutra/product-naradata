@@ -20,10 +20,10 @@
                 </div>
                 <div class="col-auto">
                     <div class="btn-group">
-                        <a href="{{ route('sales.export.excel') }}?search={{ request('search') }}&start_date={{ request('start_date') }}&end_date={{ request('end_date') }}" class="btn btn-sm btn-outline-success" id="excelExportBtn">
+                        <a href="{{ secure_url(route('sales.export.excel', [], false)) }}?search={{ request('search') }}&start_date={{ request('start_date') }}&end_date={{ request('end_date') }}" class="btn btn-sm btn-outline-success" id="excelExportBtn">
                             <i class="fas fa-file-excel me-1"></i> Export Excel
                         </a>
-                        <a href="{{ route('sales.export.pdf') }}?search={{ request('search') }}&start_date={{ request('start_date') }}&end_date={{ request('end_date') }}" class="btn btn-sm btn-outline-danger" id="pdfExportBtn">
+                        <a href="{{ secure_url(route('sales.export.pdf', [], false)) }}?search={{ request('search') }}&start_date={{ request('start_date') }}&end_date={{ request('end_date') }}" class="btn btn-sm btn-outline-danger" id="pdfExportBtn">
                             <i class="fas fa-file-pdf me-1"></i> Export PDF
                         </a>
                     </div>
@@ -242,8 +242,11 @@
                 queryParams.append('end_date', endDate);
             }
             
-            // Make AJAX request
-            fetch(`{{ route('sales.index') }}?${queryParams.toString()}`, {
+            // Make AJAX request - use current protocol (http/https)
+            const baseUrl = window.location.protocol + '//' + window.location.host;
+            const url = new URL('{{ route('sales.index', [], false) }}', baseUrl);
+            
+            fetch(`${url}?${queryParams.toString()}`, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
@@ -314,17 +317,21 @@
             const pdfLink = document.getElementById('pdfExportBtn');
             
             if (excelLink) {
-                let url = `{{ route('sales.export.excel') }}?search=${search}`;
-                if (startDate) url += `&start_date=${startDate}`;
-                if (endDate) url += `&end_date=${endDate}`;
-                excelLink.href = url;
+                const baseUrl = window.location.protocol + '//' + window.location.host;
+                let url = new URL('{{ route('sales.export.excel', [], false) }}', baseUrl);
+                url.searchParams.set('search', search || '');
+                if (startDate) url.searchParams.set('start_date', startDate);
+                if (endDate) url.searchParams.set('end_date', endDate);
+                excelLink.href = url.toString();
             }
             
             if (pdfLink) {
-                let url = `{{ route('sales.export.pdf') }}?search=${search}`;
-                if (startDate) url += `&start_date=${startDate}`;
-                if (endDate) url += `&end_date=${endDate}`;
-                pdfLink.href = url;
+                const baseUrl = window.location.protocol + '//' + window.location.host;
+                let url = new URL('{{ route('sales.export.pdf', [], false) }}', baseUrl);
+                url.searchParams.set('search', search || '');
+                if (startDate) url.searchParams.set('start_date', startDate);
+                if (endDate) url.searchParams.set('end_date', endDate);
+                pdfLink.href = url.toString();
             }
         }
         

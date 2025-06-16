@@ -37,7 +37,7 @@
                             </div>
                             <div class="modal-footer py-1">
                                 <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Batal</button>
-                                <form action="{{ route('sales.destroy', $sale) }}" method="POST">
+                                <form action="{{ secure_url(route('sales.destroy', $sale, false)) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
