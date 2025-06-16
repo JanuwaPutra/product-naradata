@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Edit Produk')
+@section('title', 'Edit Barang')
 
 @section('header-buttons')
     <a href="{{ route('products.index') }}" class="btn btn-light btn-sm">
@@ -12,7 +12,7 @@
     <div class="card border-0 shadow-sm">
         <div class="card-header bg-white py-2">
             <h5 class="card-title mb-0 fw-semibold">
-                <i class="fas fa-edit me-1 text-primary"></i>Edit Produk
+                <i class="fas fa-edit me-1 text-primary"></i>Edit Barang
             </h5>
         </div>
         <div class="card-body p-3">
@@ -24,19 +24,19 @@
                     <div class="col-lg-8">
                         <div class="card border bg-light bg-opacity-50 mb-3">
                             <div class="card-body p-3">
-                                <h6 class="fw-semibold mb-2 small">Informasi Produk</h6>
+                                <h6 class="fw-semibold mb-2 small">Informasi Barang</h6>
                                 
                                 <div class="mb-3">
-                                    <label for="name" class="form-label fw-medium small">Nama Produk <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $product->name) }}" placeholder="Masukkan nama produk" required>
+                                    <label for="name" class="form-label fw-medium small">Nama Barang <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $product->name) }}" placeholder="Masukkan nama barang" required>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
                                 <div class="mb-0">
-                                    <label for="description" class="form-label fw-medium small">Deskripsi Produk</label>
-                                    <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="4" placeholder="Masukkan deskripsi produk (opsional)">{{ old('description', $product->description) }}</textarea>
+                                    <label for="description" class="form-label fw-medium small">Deskripsi Barang</label>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="4" placeholder="Masukkan deskripsi barang (opsional)">{{ old('description', $product->description) }}</textarea>
                                     @error('description')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror

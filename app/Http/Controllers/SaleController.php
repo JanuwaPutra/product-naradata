@@ -4,18 +4,237 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\Product;
+use App\Exports\SalesExport;
+use App\Imports\SalesImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class SaleController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $sales = Sale::with('product')->latest()->paginate(10);
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search', '');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        
+        $query = Sale::with('product');
+        
+        // Apply date range filter if provided
+        if (!empty($startDate)) {
+            $query->whereDate('sale_date', '>=', $startDate);
+        }
+        
+        if (!empty($endDate)) {
+            $query->whereDate('sale_date', '<=', $endDate);
+        }
+        
+        // Apply search filter if provided
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('product', function($subQ) use ($search) {
+                    $subQ->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('id', 'like', "%{$search}%")
+                ->orWhere('total_price', 'like', "%{$search}%")
+                ->orWhereRaw("DATE_FORMAT(sale_date, '%d %b %Y') LIKE ?", ["%{$search}%"]);
+            });
+        }
+        
+        $sales = $query->latest()->paginate($perPage);
+        
+        // If it's an AJAX request, append the query parameters
+        if ($request->ajax()) {
+            $sales->appends([
+                'search' => $search,
+                'per_page' => $perPage,
+                'start_date' => $startDate,
+                'end_date' => $endDate
+            ]);
+            
+            $view = view('sales.partials.sale-table', compact('sales'))->render();
+            
+            return response()->json([
+                'html' => $view,
+                'pagination' => $sales->links()->toHtml(),
+                'from' => $sales->firstItem(),
+                'to' => $sales->lastItem(),
+                'total' => $sales->total()
+            ]);
+        }
+        
         return view('sales.index', compact('sales'));
+    }
+    
+    /**
+     * Export sales to Excel
+     */
+    public function exportExcel(Request $request)
+    {
+        $search = $request->input('search', '');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        
+        $filename = 'sales';
+        if ($startDate && $endDate) {
+            $filename = "sales_{$startDate}_to_{$endDate}";
+        } elseif ($startDate) {
+            $filename = "sales_from_{$startDate}";
+        } elseif ($endDate) {
+            $filename = "sales_until_{$endDate}";
+        }
+        
+        return Excel::download(new SalesExport($search, $startDate, $endDate), $filename . '.xlsx');
+    }
+
+    /**
+     * Export sales to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $search = $request->input('search', '');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        
+        $query = Sale::with('product');
+        
+        // Apply date range filter if provided
+        if (!empty($startDate)) {
+            $query->whereDate('sale_date', '>=', $startDate);
+        }
+        
+        if (!empty($endDate)) {
+            $query->whereDate('sale_date', '<=', $endDate);
+        }
+        
+        // Apply search filter if provided
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->whereHas('product', function($subQ) use ($search) {
+                    $subQ->where('name', 'like', "%{$search}%");
+                })
+                ->orWhere('id', 'like', "%{$search}%")
+                ->orWhere('total_price', 'like', "%{$search}%");
+            });
+        }
+        
+        $sales = $query->latest()->get();
+        
+        $filename = 'sales';
+        if ($startDate && $endDate) {
+            $filename = "sales_{$startDate}_to_{$endDate}";
+        } elseif ($startDate) {
+            $filename = "sales_from_{$startDate}";
+        } elseif ($endDate) {
+            $filename = "sales_until_{$endDate}";
+        }
+        
+        $pdf = PDF::loadView('sales.pdf', compact('sales', 'startDate', 'endDate'));
+        return $pdf->download($filename . '.pdf');
+    }
+    
+    /**
+     * Show import form
+     */
+    public function importForm()
+    {
+        return view('sales.import');
+    }
+    
+    /**
+     * Download import template
+     */
+    public function downloadTemplate()
+    {
+        // Get available products for reference
+        $products = Product::where('stock', '>', 0)->pluck('name')->take(2)->toArray();
+        $productNames = !empty($products) ? $products : ['Contoh Barang 1', 'Contoh Barang 2'];
+        
+        $today = Carbon::now()->format('Y-m-d');
+        $yesterday = Carbon::now()->subDay()->format('Y-m-d');
+        
+        $headers = [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="template_import_penjualan.xlsx"',
+        ];
+        
+        // Create a simple export class for the template
+        $export = new class($productNames, $today, $yesterday) implements FromArray, WithHeadings {
+            protected $productNames;
+            protected $today;
+            protected $yesterday;
+            
+            public function __construct($productNames, $today, $yesterday)
+            {
+                $this->productNames = $productNames;
+                $this->today = $today;
+                $this->yesterday = $yesterday;
+            }
+            
+            public function array(): array
+            {
+                return [
+                    [
+                        $this->productNames[0],
+                        2,
+                        $this->today,
+                    ],
+                    [
+                        $this->productNames[1] ?? $this->productNames[0],
+                        1,
+                        $this->yesterday,
+                    ]
+                ];
+            }
+            
+            public function headings(): array
+            {
+                return [
+                    'nama_barang',
+                    'jumlah',
+                    'tanggal',
+                ];
+            }
+        };
+        
+        return Excel::download($export, 'template_import_penjualan.xlsx');
+    }
+    
+    /**
+     * Import sales from Excel
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+        
+        try {
+            Excel::import(new SalesImport, $request->file('file'));
+            
+            return redirect()->route('sales.index')
+                ->with('success', 'Data penjualan berhasil diimport.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            
+            foreach ($failures as $failure) {
+                $errors[] = 'Baris ke-' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            
+            return back()->withErrors($errors);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     /**

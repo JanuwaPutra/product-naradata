@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Produk')
+@section('title', 'Detail Barang')
 
 @section('header-buttons')
     <div class="d-flex gap-2">
@@ -18,7 +18,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-sm mb-3">
                 <div class="card-header bg-white py-2">
-                    <h5 class="mb-0 fw-semibold small">Informasi Produk</h5>
+                    <h5 class="mb-0 fw-semibold small">Informasi Barang</h5>
                 </div>
                 <div class="card-body p-3">
                     <h4 class="mb-3 fw-bold">{{ $product->name }}</h4>
@@ -74,8 +74,8 @@
 
                     <div class="card border bg-light bg-opacity-50 mb-3">
                         <div class="card-body p-3">
-                            <h6 class="fw-semibold mb-2 small">Deskripsi Produk</h6>
-                            <p class="mb-0 small">{{ $product->description ?? 'Tidak ada deskripsi untuk produk ini.' }}</p>
+                            <h6 class="fw-semibold mb-2 small">Deskripsi Barang</h6>
+                            <p class="mb-0 small">{{ $product->description ?? 'Tidak ada deskripsi untuk barang ini.' }}</p>
                         </div>
                     </div>
 
@@ -109,9 +109,9 @@
 
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-semibold small">Riwayat Penjualan</h5>
+                    <h5 class="mb-0 fw-semibold small">Riwayat Transaksi</h5>
                     <a href="{{ route('sales.create') }}" class="btn btn-sm btn-primary btn-xs">
-                        <i class="fas fa-plus me-1"></i> Catat Penjualan
+                        <i class="fas fa-plus me-1"></i> Catat Transaksi
                     </a>
                 </div>
                 <div class="card-body p-0">
@@ -140,16 +140,16 @@
                         </div>
                         <div class="p-2 border-top text-center">
                             <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-primary btn-xs">
-                                <i class="fas fa-list me-1"></i> Lihat semua riwayat penjualan
+                                <i class="fas fa-list me-1"></i> Lihat semua riwayat transaksi
                             </a>
                         </div>
                     @else
                         <div class="text-center py-3">
-                            <i class="fas fa-shopping-cart fa-2x text-secondary mb-2"></i>
-                            <h6 class="fw-bold">Belum Ada Penjualan</h6>
-                            <p class="text-muted mb-3 small">Belum ada catatan penjualan untuk produk ini</p>
+                            <i class="fas fa-exchange-alt fa-2x text-secondary mb-2"></i>
+                            <h6 class="fw-bold">Belum Ada Transaksi</h6>
+                            <p class="text-muted mb-3 small">Belum ada catatan transaksi untuk barang ini</p>
                             <a href="{{ route('sales.create') }}" class="btn btn-primary btn-sm px-3">
-                                <i class="fas fa-plus me-1"></i> Catat Penjualan Pertama
+                                <i class="fas fa-plus me-1"></i> Catat Transaksi Pertama
                             </a>
                         </div>
                     @endif
@@ -160,7 +160,7 @@
 
     <div class="mt-3 d-flex justify-content-end">
         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-            <i class="fas fa-trash me-1"></i> Hapus Produk
+            <i class="fas fa-trash me-1"></i> Hapus Barang
         </button>
     </div>
     
@@ -173,14 +173,14 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.</p>
+                    <p>Apakah Anda yakin ingin menghapus barang ini? Tindakan ini tidak dapat dibatalkan.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
                     <form action="{{ route('products.destroy', $product) }}" method="POST">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Hapus Produk</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Hapus Barang</button>
                     </form>
                 </div>
             </div>

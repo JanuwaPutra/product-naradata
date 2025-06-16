@@ -9,10 +9,10 @@
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center mb-2">
                         <div class="icon-box bg-primary bg-opacity-10 rounded-3 p-2 me-2">
-                            <i class="fas fa-box text-primary"></i>
+                            <i class="fas fa-boxes text-primary"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-0 small text-uppercase">Total Produk</h6>
+                            <h6 class="text-muted mb-0 small text-uppercase">Total Barang</h6>
                             <h4 class="mb-0 fw-bold">{{ $totalProducts }}</h4>
                         </div>
                     </div>
@@ -37,7 +37,7 @@
                     <div class="progress mb-1" style="height: 5px;">
                         <div class="progress-bar bg-danger" role="progressbar" style="width: {{ min(100, ($lowStockProducts / max(1, $totalProducts)) * 100) }}%" aria-valuenow="{{ $lowStockProducts }}" aria-valuemin="0" aria-valuemax="{{ $totalProducts }}"></div>
                     </div>
-                    <p class="card-text text-muted small mb-0">Produk dengan stok < 10</p>
+                    <p class="card-text text-muted small mb-0">Barang dengan stok < 10</p>
                 </div>
             </div>
         </div>
@@ -46,15 +46,15 @@
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center mb-2">
                         <div class="icon-box bg-success bg-opacity-10 rounded-3 p-2 me-2">
-                            <i class="fas fa-cash-register text-success"></i>
+                            <i class="fas fa-exchange-alt text-success"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-0 small text-uppercase">Penjualan Hari Ini</h6>
+                            <h6 class="text-muted mb-0 small text-uppercase">Transaksi Hari Ini</h6>
                             <h4 class="mb-0 fw-bold">Rp {{ number_format($todaySales, 0, ',', '.') }}</h4>
                         </div>
                     </div>
                     <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-success w-100 btn-xs">
-                        <i class="fas fa-chart-line me-1"></i> Lihat Penjualan
+                        <i class="fas fa-chart-line me-1"></i> Lihat Transaksi
                     </a>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                             <i class="fas fa-chart-line text-warning"></i>
                         </div>
                         <div>
-                            <h6 class="text-muted mb-0 small text-uppercase">Penjualan Bulan Ini</h6>
+                            <h6 class="text-muted mb-0 small text-uppercase">Transaksi Bulan Ini</h6>
                             <h4 class="mb-0 fw-bold">Rp {{ number_format($thisMonthSales, 0, ',', '.') }}</h4>
                         </div>
                     </div>
@@ -93,7 +93,7 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white py-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-chart-line me-1 text-primary"></i> Grafik Penjualan</h5>
+                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-chart-line me-1 text-primary"></i> Grafik Transaksi</h5>
                         <div class="btn-group btn-group-sm" role="group">
                             <button type="button" class="btn btn-outline-secondary btn-xs active" id="weekly-sales">Mingguan</button>
                             <button type="button" class="btn btn-outline-secondary btn-xs" id="monthly-sales">Bulanan</button>
@@ -113,9 +113,9 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white py-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-boxes me-1 text-danger"></i> Level Stok Produk</h5>
+                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-boxes me-1 text-danger"></i> Level Stok Barang</h5>
                         <a href="{{ route('products.index') }}" class="btn btn-sm btn-outline-primary btn-xs">
-                            <i class="fas fa-box me-1"></i> Kelola Produk
+                            <i class="fas fa-boxes me-1"></i> Kelola Inventaris
                         </a>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white py-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-crown me-1 text-warning"></i> Produk Terlaris</h5>
+                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-crown me-1 text-warning"></i> Barang Terlaris</h5>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -140,8 +140,8 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>#</th>
-                                    <th>Produk</th>
-                                    <th class="text-end">Unit Terjual</th>
+                                    <th>Barang</th>
+                                    <th class="text-end">Unit Keluar</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -173,7 +173,7 @@
                                         <td colspan="3" class="text-center py-4">
                                             <i class="fas fa-chart-bar fa-2x text-secondary mb-2"></i>
                                             <h6 class="fw-bold">Belum Ada Data</h6>
-                                            <p class="text-muted small">Belum ada data penjualan produk</p>
+                                            <p class="text-muted small">Belum ada data transaksi barang</p>
                                         </td>
                                     </tr>
                                 @endforelse
@@ -188,9 +188,9 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white py-2">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-clock me-1 text-info"></i> Penjualan Terbaru</h5>
+                        <h5 class="mb-0 fw-semibold small"><i class="fas fa-clock me-1 text-info"></i> Transaksi Terbaru</h5>
                         <a href="{{ route('sales.create') }}" class="btn btn-sm btn-primary btn-xs">
-                            <i class="fas fa-plus me-1"></i> Catat Penjualan
+                            <i class="fas fa-plus me-1"></i> Catat Transaksi
                         </a>
                     </div>
                 </div>
@@ -200,7 +200,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Tanggal</th>
-                                    <th>Produk</th>
+                                    <th>Barang</th>
                                     <th>Qty</th>
                                     <th class="text-end">Total</th>
                                 </tr>
@@ -224,11 +224,11 @@
                                 @empty
                                     <tr>
                                         <td colspan="4" class="text-center py-4">
-                                            <i class="fas fa-receipt fa-2x text-secondary mb-2"></i>
-                                            <h6 class="fw-bold">Belum Ada Penjualan</h6>
-                                            <p class="text-muted small mb-2">Belum ada data penjualan terbaru</p>
+                                            <i class="fas fa-exchange-alt fa-2x text-secondary mb-2"></i>
+                                            <h6 class="fw-bold">Belum Ada Transaksi</h6>
+                                            <p class="text-muted small mb-2">Belum ada data transaksi terbaru</p>
                                             <a href="{{ route('sales.create') }}" class="btn btn-primary btn-sm">
-                                                <i class="fas fa-plus me-1"></i> Catat Penjualan
+                                                <i class="fas fa-plus me-1"></i> Catat Transaksi
                                             </a>
                                         </td>
                                     </tr>
@@ -240,7 +240,7 @@
                 @if(count($recentSales) > 0)
                 <div class="card-footer bg-white border-top py-2 text-center">
                     <a href="{{ route('sales.index') }}" class="btn btn-sm btn-outline-primary btn-xs">
-                        <i class="fas fa-list me-1"></i> Lihat Semua Penjualan
+                        <i class="fas fa-list me-1"></i> Lihat Semua Transaksi
                     </a>
                 </div>
                 @endif
@@ -274,7 +274,7 @@
         // Sales Chart
         const salesChartOptions = {
             series: [{
-                name: 'Penjualan',
+                name: 'Transaksi',
                 data: weeklySalesData.map(item => item.y)
             }],
             chart: {
