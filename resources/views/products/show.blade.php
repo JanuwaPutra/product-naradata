@@ -14,33 +14,8 @@
 @endsection
 
 @section('content')
-    <div class="row g-3">
-        <div class="col-lg-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-2">
-                    <h5 class="mb-0 fw-semibold small">Gambar Produk</h5>
-                </div>
-                <div class="card-body text-center p-0">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid" style="max-height: 300px; width: 100%; object-fit: contain;">
-                    @else
-                        <div class="bg-light d-flex flex-column align-items-center justify-content-center p-4" style="height: 200px;">
-                            <i class="fas fa-image fa-3x text-secondary mb-2"></i>
-                            <p class="text-muted small">Tidak ada gambar produk</p>
-                        </div>
-                    @endif
-                </div>
-                <div class="card-footer bg-white border-top py-2">
-                    <div class="d-flex justify-content-center">
-                        <span class="badge bg-primary rounded-pill px-2 py-1">
-                            <i class="fas fa-tag me-1"></i> ID: {{ $product->id }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-8">
+    <div class="row">
+        <div class="col-12">
             <div class="card border-0 shadow-sm mb-3">
                 <div class="card-header bg-white py-2">
                     <h5 class="mb-0 fw-semibold small">Informasi Produk</h5>
@@ -184,13 +159,32 @@
     </div>
 
     <div class="mt-3 d-flex justify-content-end">
-        <form action="{{ route('products.destroy', $product) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.');">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger btn-sm">
-                <i class="fas fa-trash me-1"></i> Hapus Produk
-            </button>
-        </form>
+        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="fas fa-trash me-1"></i> Hapus Produk
+        </button>
+    </div>
+    
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                    <form action="{{ route('products.destroy', $product) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm">Hapus Produk</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
     
     <style>

@@ -16,7 +16,7 @@
             </h5>
         </div>
         <div class="card-body p-3">
-            <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('products.store') }}" method="POST">
                 @csrf
                 
                 <div class="row g-3">
@@ -70,36 +70,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="card border bg-light bg-opacity-50">
-                            <div class="card-body p-3">
-                                <h6 class="fw-semibold mb-2 small">Foto Produk</h6>
-                                
-                                <div class="mb-2">
-                                    <div class="text-center mb-2" id="image-preview-container" style="display: none;">
-                                        <img id="image-preview" src="#" alt="Preview" class="img-fluid rounded border" style="max-height: 150px; object-fit: contain;">
-                                    </div>
-                                    
-                                    <div class="text-center mb-2" id="default-preview">
-                                        <div class="bg-white border rounded py-3">
-                                            <i class="fas fa-image fa-2x text-secondary mb-1"></i>
-                                            <p class="text-muted small mb-0">Belum ada foto produk</p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-grid">
-                                        <label for="image" class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-upload me-1"></i> Pilih Foto
-                                        </label>
-                                        <input type="file" class="form-control d-none @error('image') is-invalid @enderror" id="image" name="image" accept="image/*">
-                                    </div>
-                                    <div class="form-text text-center" style="font-size: 0.75rem;">Format: JPG, PNG, JPEG (Max: 2MB)</div>
-                                    @error('image')
-                                        <div class="invalid-feedback d-block text-center">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -114,32 +84,4 @@
             </form>
         </div>
     </div>
-@endsection
-
-@section('scripts')
-<script>
-    // Image preview
-    document.addEventListener('DOMContentLoaded', function() {
-        const imageInput = document.getElementById('image');
-        const imagePreview = document.getElementById('image-preview');
-        const imagePreviewContainer = document.getElementById('image-preview-container');
-        const defaultPreview = document.getElementById('default-preview');
-        
-        imageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    imagePreview.src = event.target.result;
-                    imagePreviewContainer.style.display = 'block';
-                    defaultPreview.style.display = 'none';
-                }
-                reader.readAsDataURL(file);
-            } else {
-                imagePreviewContainer.style.display = 'none';
-                defaultPreview.style.display = 'block';
-            }
-        });
-    });
-</script>
 @endsection 

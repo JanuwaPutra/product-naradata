@@ -66,7 +66,6 @@
                     <thead class="table-light">
                         <tr>
                             <th width="50" class="text-center">#</th>
-                            <th width="60">Gambar</th>
                             <th>Nama Produk</th>
                             <th>Harga</th>
                             <th>Stok</th>
@@ -77,19 +76,6 @@
                         @forelse($products as $product)
                             <tr>
                                 <td class="text-center">{{ $product->id }}</td>
-                                <td>
-                                    @if($product->image)
-                                        <img src="{{ asset('storage/' . $product->image) }}" 
-                                             alt="{{ $product->name }}" 
-                                             class="rounded-circle border" 
-                                             style="height: 36px; width: 36px; object-fit: cover;">
-                                    @else
-                                        <div class="bg-light d-flex align-items-center justify-content-center rounded-circle border" 
-                                             style="height: 36px; width: 36px;">
-                                            <i class="fas fa-image text-secondary small"></i>
-                                        </div>
-                                    @endif
-                                </td>
                                 <td>
                                     <a href="{{ route('products.show', $product) }}" class="text-decoration-none fw-medium text-dark">
                                         {{ $product->name }}
@@ -118,22 +104,38 @@
                                         <a href="{{ route('products.edit', $product) }}" class="btn btn-sm btn-outline-warning btn-xs" data-bs-toggle="tooltip" title="Edit Produk">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('products.destroy', $product) }}" 
-                                              method="POST" 
-                                              onsubmit="return confirm('Apakah Anda yakin ingin menghapus produk ini?');"
-                                              class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger btn-xs" data-bs-toggle="tooltip" title="Hapus Produk">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <button type="button" class="btn btn-sm btn-outline-danger btn-xs" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $product->id }}" title="Hapus Produk">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        
+                                        <!-- Delete Modal -->
+                                        <div class="modal fade" id="deleteModal{{ $product->id }}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-sm">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title small">Konfirmasi Hapus</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="mb-0 small">Apakah Anda yakin ingin menghapus produk ini?</p>
+                                                    </div>
+                                                    <div class="modal-footer py-1">
+                                                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Batal</button>
+                                                        <form action="{{ route('products.destroy', $product) }}" method="POST">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-4">
+                                <td colspan="5" class="text-center py-4">
                                     <div class="py-3">
                                         <i class="fas fa-box-open fa-3x text-secondary mb-3"></i>
                                         <h6 class="fw-bold">Tidak Ada Produk</h6>
