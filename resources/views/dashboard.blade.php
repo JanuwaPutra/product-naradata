@@ -89,7 +89,7 @@
     <!-- Chart Row -->
     <div class="row g-3 mb-3">
         <!-- Sales Chart -->
-        <div class="col-md-8 mb-3">
+        <div class="col-md-12 mb-3">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header bg-white py-2">
                     <div class="d-flex justify-content-between align-items-center">
@@ -102,18 +102,6 @@
                 </div>
                 <div class="card-body">
                     <div id="salesChart" style="height: 280px;"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Product Distribution Chart -->
-        <div class="col-md-4 mb-3">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white py-2">
-                    <h5 class="mb-0 fw-semibold small"><i class="fas fa-chart-pie me-1 text-info"></i> Distribusi Produk</h5>
-                </div>
-                <div class="card-body">
-                    <div id="productDistributionChart" style="height: 280px;"></div>
                 </div>
             </div>
         </div>
@@ -279,8 +267,6 @@
     // Use actual data from the controller
     const weeklySalesData = @json($weeklySalesData);
     const monthlySalesData = @json($monthlySalesData);
-    const productDistributionData = @json($productDistributionData['data']);
-    const productCategories = @json($productDistributionData['categories']);
     const stockLevelsData = @json($stockLevelsData);
 
     // Initialize charts when DOM is loaded
@@ -364,73 +350,6 @@
             }
         };
 
-        // Product Distribution Chart
-        const productDistributionOptions = {
-            series: productDistributionData,
-            chart: {
-                type: 'donut',
-                height: 280,
-                fontFamily: 'Inter, sans-serif',
-            },
-            labels: productCategories,
-            colors: ['#4361ee', '#4cc9f0', '#f72585', '#adb5bd'],
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '65%',
-                        labels: {
-                            show: true,
-                            total: {
-                                show: true,
-                                showAlways: false,
-                                label: 'Total Produk',
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                color: '#495057',
-                                formatter: function (w) {
-                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            legend: {
-                position: 'bottom',
-                fontSize: '12px',
-                markers: {
-                    width: 10,
-                    height: 10,
-                    radius: 2
-                },
-                itemMargin: {
-                    horizontal: 10,
-                    vertical: 2
-                }
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        height: 250
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }],
-            tooltip: {
-                y: {
-                    formatter: function(val) {
-                        return val + ' produk';
-                    }
-                }
-            }
-        };
-        
         // Stock Levels Chart
         const stockLevelsOptions = {
             series: [{
@@ -503,9 +422,6 @@
         // Initialize charts
         const salesChart = new ApexCharts(document.querySelector("#salesChart"), salesChartOptions);
         salesChart.render();
-
-        const productDistributionChart = new ApexCharts(document.querySelector("#productDistributionChart"), productDistributionOptions);
-        productDistributionChart.render();
         
         const stockLevelsChart = new ApexCharts(document.querySelector("#stockLevelsChart"), stockLevelsOptions);
         stockLevelsChart.render();

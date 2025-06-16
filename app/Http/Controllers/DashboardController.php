@@ -43,9 +43,6 @@ class DashboardController extends Controller
         // Monthly sales data for chart (last 12 months)
         $monthlySalesData = $this->getMonthlySalesData();
         
-        // Product categories distribution
-        $productDistributionData = $this->getProductDistributionData();
-        
         // Stock levels for top products
         $stockLevelsData = $this->getStockLevelsData();
         
@@ -58,7 +55,6 @@ class DashboardController extends Controller
             'recentSales',
             'weeklySalesData',
             'monthlySalesData',
-            'productDistributionData',
             'stockLevelsData'
         ));
     }
@@ -121,31 +117,6 @@ class DashboardController extends Controller
         });
         
         return $result->values();
-    }
-    
-    /**
-     * Get product distribution data by category
-     */
-    private function getProductDistributionData()
-    {
-        // For this example, we'll use random data since we don't have actual categories
-        // In a real application, you would query the database for product categories
-        
-        // Example categories
-        $categories = ['Elektronik', 'Pakaian', 'Makanan', 'Lainnya'];
-        
-        // Count products per category (random for this example)
-        $data = [
-            rand(5, 20),  // Elektronik
-            rand(10, 30), // Pakaian
-            rand(8, 25),  // Makanan
-            rand(5, 15)   // Lainnya
-        ];
-        
-        return [
-            'categories' => $categories,
-            'data' => $data
-        ];
     }
     
     /**
