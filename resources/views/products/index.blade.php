@@ -103,7 +103,6 @@
                     <tbody id="productsTable">
                         @forelse($products as $product)
                             <tr>
-
                                 <td>
                                     <a href="{{ route('products.show', $product) }}" class="text-decoration-none fw-medium text-dark">
                                         {{ $product->name }}
@@ -163,7 +162,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-4">
+                                <td colspan="4" class="text-center py-4">
                                     <div class="py-3">
                                         <i class="fas fa-boxes fa-3x text-secondary mb-3"></i>
                                         <h6 class="fw-bold">Tidak Ada Barang</h6>
@@ -221,7 +220,7 @@
             // Show loading indicator
             document.getElementById('productsTable').innerHTML = `
                 <tr>
-                    <td colspan="5" class="text-center py-4">
+                    <td colspan="4" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -272,7 +271,7 @@
                 console.error('Error loading products:', error);
                 document.getElementById('productsTable').innerHTML = `
                     <tr>
-                        <td colspan="5" class="text-center py-4">
+                        <td colspan="4" class="text-center py-4">
                             <div class="py-3">
                                 <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                                 <h6 class="fw-bold">Error</h6>

@@ -1,6 +1,5 @@
 @forelse($sales as $sale)
     <tr>
-        <td class="text-center">{{ $sale->id }}</td>
         <td>{{ $sale->sale_date->format('d M Y') }}</td>
         <td>
             <a href="{{ route('products.show', $sale->product) }}" class="text-decoration-none fw-medium text-dark">
@@ -51,7 +50,7 @@
     </tr>
 @empty
     <tr>
-        <td colspan="7" class="text-center py-4">
+        <td colspan="6" class="text-center py-4">
             <div class="py-3">
                 <i class="fas fa-exchange-alt fa-3x text-secondary mb-3"></i>
                 <h6 class="fw-bold">Belum Ada Transaksi</h6>

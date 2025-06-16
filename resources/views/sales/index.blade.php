@@ -130,7 +130,7 @@
                                                     </div>
                                                     <div class="modal-footer py-1">
                                                         <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Batal</button>
-                                                        <form action="{{ route('sales.destroy', $sale) }}" method="POST">
+                                                        <form action="{{ secure_url(route('sales.destroy', $sale, false)) }}" method="POST">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
@@ -144,7 +144,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-4">
+                                <td colspan="6" class="text-center py-4">
                                     <div class="py-3">
                                         <i class="fas fa-exchange-alt fa-3x text-secondary mb-3"></i>
                                         <h6 class="fw-bold">Belum Ada Transaksi</h6>
@@ -219,7 +219,7 @@
             // Show loading indicator
             document.getElementById('salesTable').innerHTML = `
                 <tr>
-                    <td colspan="7" class="text-center py-4">
+                    <td colspan="6" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
@@ -299,7 +299,7 @@
                 console.error('Error loading sales:', error);
                 document.getElementById('salesTable').innerHTML = `
                     <tr>
-                        <td colspan="7" class="text-center py-4">
+                        <td colspan="6" class="text-center py-4">
                             <div class="py-3">
                                 <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                                 <h6 class="fw-bold">Error</h6>
