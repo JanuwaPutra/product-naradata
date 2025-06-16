@@ -467,14 +467,13 @@
         </div>
     </div>
 
-    <footer class="py-3 mt-auto">
+    <!-- <footer class="py-3 mt-auto">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center">
-                <span>© 2023 Naradata</span>
-                <span>Sistem Manajemen Gudang v1.0</span>
+                <span>© 2025 Naradata</span>
             </div>
         </div>
-    </footer>
+    </footer> -->
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
