@@ -199,7 +199,7 @@ class SaleController extends Controller
             
             DB::commit();
             
-            return redirect()->route('sales.index')
+            return redirect()->route('sales.show', $sale)
                 ->with('success', 'Penjualan berhasil diperbarui dan stok produk telah diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
