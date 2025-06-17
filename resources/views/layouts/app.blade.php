@@ -695,8 +695,7 @@
             <div class="col-md-2 col-lg-2 px-0 sidebar">
                 <div class="sidebar-header">
                     <div class="logo-container">
-                        <img src="{{ asset('images/naradata-logo.png') }}" alt="Naradata Logo" style="height: 40px; width: auto;">
-                        <span class="brand-name">Naradata</span>
+                        <span class="brand-name">Navigasi</span>
                     </div>
                 </div>
                 
