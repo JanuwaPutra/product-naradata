@@ -6,7 +6,13 @@
     <meta name="theme-color" content="#0d47a1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>{{ config('app.name', 'Sistem Gudang') }}</title>
+    <title>{{ config('app.name', 'Sistem Manajemen Gudang Naradata') }}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon/favicon.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/favicon/favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('images/favicon/favicon.png') }}">
+    
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -661,7 +667,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid px-3">
             <a class="navbar-brand d-flex align-items-center" href="{{ route('dashboard') }}">
-                <i class="fas fa-warehouse me-2"></i>
+                <img src="{{ asset('images/naradata-logo.png') }}" alt="Naradata Logo" style="height: 30px; width: auto; margin-right: 10px;">
                 Sistem Manajemen Gudang Naradata
             </a>
             <button class="navbar-toggler" type="button" id="sidebarToggle">
@@ -689,7 +695,7 @@
             <div class="col-md-2 col-lg-2 px-0 sidebar">
                 <div class="sidebar-header">
                     <div class="logo-container">
-                        <img src="{{ asset('images/naradata-logo.png') }}" alt="Naradata Logo">
+                        <img src="{{ asset('images/naradata-logo.png') }}" alt="Naradata Logo" style="height: 40px; width: auto;">
                         <span class="brand-name">Naradata</span>
                     </div>
                 </div>
