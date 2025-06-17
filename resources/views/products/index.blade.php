@@ -3,18 +3,20 @@
 @section('title', 'Daftar Inventaris')
 
 @section('header-buttons')
-    <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">
-        <i class="fas fa-plus me-1"></i> Tambah Barang
-    </a>
-    <a href="{{ route('products.import.form') }}" class="btn btn-success btn-sm">
-        <i class="fas fa-file-import me-1"></i> Import Excel
-    </a>
+    <div class="header-buttons">
+        <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus me-1"></i> Tambah Barang
+        </a>
+        <a href="{{ route('products.import.form') }}" class="btn btn-success btn-sm">
+            <i class="fas fa-file-import me-1"></i> Import Excel
+        </a>
+    </div>
 @endsection
 
 @section('content')
-    <div class="row mb-3">
-        <div class="col-md-6 col-lg-3 mb-2 mb-lg-0">
-            <div class="card bg-white border-0 shadow-sm">
+    <div class="row mb-3 g-2">
+        <div class="col-6 col-md-6 col-lg-3">
+            <div class="card bg-white border-0 shadow-sm h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center">
                         <div class="icon-box bg-primary bg-opacity-10 rounded p-2 me-2">
@@ -28,8 +30,8 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-white border-0 shadow-sm">
+        <div class="col-6 col-md-6 col-lg-3">
+            <div class="card bg-white border-0 shadow-sm h-100">
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center">
                         <div class="icon-box bg-success bg-opacity-10 rounded p-2 me-2">
@@ -64,23 +66,23 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row mb-3">
-                <div class="col-md-6">
+            <div class="row mb-3 g-2">
+                <div class="col-12 col-md-6 order-2 order-md-1">
                     <div class="d-flex align-items-center">
-                        <label class="me-2">Show</label>
-                        <select id="perPage" class="form-select form-select-sm" style="width: 80px; min-width: 80px;">
+                        <label class="me-2 small">Show</label>
+                        <select id="perPage" class="form-select form-select-sm" style="width: 70px; min-width: 70px;">
                             <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
                             <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
                             <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
                             <option value="100" {{ request('per_page') == 100 ? 'selected' : '' }}>100</option>
                         </select>
-                        <label class="ms-2">entries</label>
+                        <label class="ms-2 small">entries</label>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center justify-content-md-end">
-                        <label class="me-2">Search:</label>
-                        <div class="input-group input-group-sm" style="width: auto; max-width: 250px;">
+                <div class="col-12 col-md-6 order-1 order-md-2 mb-2 mb-md-0">
+                    <div class="d-flex align-items-center justify-content-start justify-content-md-end">
+                        <label class="me-2 small d-none d-sm-block">Search:</label>
+                        <div class="input-group input-group-sm flex-grow-1" style="max-width: 100%;">
                             <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Cari barang..." value="{{ request('search') }}">
                             <button class="btn btn-outline-secondary btn-sm" id="searchButton" type="button">
                                 <i class="fas fa-search"></i>
@@ -95,8 +97,8 @@
                     <thead class="table-light">
                         <tr>
                             <th>Nama Barang</th>
-                            <th>Harga</th>
-                            <th>Stok</th>
+                            <th class="d-none d-md-table-cell">Harga</th>
+                            <th class="d-none d-sm-table-cell">Stok</th>
                             <th width="100" class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -104,17 +106,28 @@
                         @forelse($products as $product)
                             <tr>
                                 <td>
-                                    <a href="{{ route('products.show', $product) }}" class="text-decoration-none fw-medium text-dark">
+                                    <a href="{{ route('products.show', $product) }}" class="text-decoration-none fw-medium text-dark d-block">
                                         {{ $product->name }}
                                     </a>
-                                    <div class="small text-muted text-truncate" style="max-width: 200px; font-size: 0.8rem;">
+                                    <div class="small text-muted text-truncate" style="max-width: 100%; font-size: 0.8rem;">
                                         {{ Str::limit($product->description ?? 'Tidak ada deskripsi', 40) }}
                                     </div>
+                                    <!-- Mobile only price and stock -->
+                                    <div class="d-flex d-sm-none align-items-center mt-1 gap-2">
+                                        <span class="fw-semibold small">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                                        @if($product->stock > 10)
+                                            <span class="badge bg-success-subtle text-success rounded-pill">{{ $product->stock }}</span>
+                                        @elseif($product->stock > 0)
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill">{{ $product->stock }}</span>
+                                        @else
+                                            <span class="badge bg-danger-subtle text-danger rounded-pill">Habis</span>
+                                        @endif
+                                    </div>
                                 </td>
-                                <td>
+                                <td class="d-none d-md-table-cell">
                                     <span class="fw-semibold small">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                                 </td>
-                                <td>
+                                <td class="d-none d-sm-table-cell">
                                     @if($product->stock > 10)
                                         <span class="badge bg-success-subtle text-success rounded-pill">{{ $product->stock }}</span>
                                     @elseif($product->stock > 0)
@@ -179,13 +192,38 @@
             </div>
 
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center p-2 border-top mt-3">
-                <div class="mb-2 mb-md-0">
+                <div class="mb-2 mb-md-0 text-center text-md-start w-100">
                     <small class="text-muted" style="font-size: 0.8rem;">Menampilkan <span id="fromItem">{{ $products->firstItem() ?? 0 }}</span> sampai <span id="toItem">{{ $products->lastItem() ?? 0 }}</span> dari <span id="totalItems">{{ $products->total() }}</span> data</small>
                 </div>
-                <div class="pagination-container" id="pagination">
+                <div class="pagination-container w-100 d-flex justify-content-center justify-content-md-end" id="pagination">
                     {{ $products->links() }}
                 </div>
             </div>
+            
+            <style>
+                /* Mobile pagination styles */
+                @media (max-width: 575.98px) {
+                    .pagination {
+                        flex-wrap: wrap;
+                        justify-content: center;
+                        gap: 0.25rem;
+                    }
+                    
+                    .page-link {
+                        padding: 0.35rem 0.65rem;
+                        font-size: 0.8rem;
+                    }
+                    
+                    /* Make touch targets bigger for mobile */
+                    .btn-xs {
+                        min-width: 32px;
+                        min-height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                }
+            </style>
         </div>
     </div>
 

@@ -2,7 +2,10 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d47a1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>{{ config('app.name', 'Sistem Gudang') }}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,6 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Apex Charts -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- Add to homescreen prompt for PWA -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
     <style>
         :root {
             --primary: #0d47a1;
@@ -472,6 +477,8 @@
             .main-content {
                 margin-left: 0 !important;
                 width: 100%;
+                padding-left: 1rem !important;
+                padding-right: 1rem !important;
             }
             
             .sidebar {
@@ -479,11 +486,13 @@
                 top: 60px;
                 left: 0;
                 height: calc(100vh - 60px);
-                width: 250px;
+                width: 80%;
+                max-width: 280px;
                 z-index: 1050;
                 transform: translateX(-100%);
                 transition: transform 0.3s ease;
                 display: none;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
             }
             
             .sidebar.show {
@@ -493,6 +502,121 @@
             
             .navbar-toggler {
                 display: block;
+            }
+            
+            /* Overlay when sidebar is open */
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1040;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .sidebar-overlay.show {
+                opacity: 1;
+                visibility: visible;
+            }
+            
+            /* Mobile-specific card adjustments */
+            .card {
+                margin-bottom: 1rem;
+            }
+            
+            /* Table adjustments for mobile */
+            .table-responsive {
+                border-radius: var(--border-radius);
+                margin-bottom: 1rem;
+            }
+            
+            /* Adjust navbar for mobile */
+            .navbar-brand {
+                font-size: 1rem;
+                max-width: 70%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            /* Bottom navigation for mobile */
+            .mobile-bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: #fff;
+                box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+                display: flex;
+                justify-content: space-around;
+                padding: 0.5rem 0;
+                z-index: 1030;
+                border-top: 1px solid var(--gray-200);
+            }
+            
+            .mobile-bottom-nav a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: var(--gray-600);
+                text-decoration: none;
+                font-size: 0.7rem;
+                padding: 0.5rem;
+                transition: all 0.2s ease;
+            }
+            
+            .mobile-bottom-nav a i {
+                font-size: 1.2rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .mobile-bottom-nav a.active {
+                color: var(--primary);
+            }
+            
+            /* Add padding to main content to account for bottom nav */
+            main {
+                padding-bottom: 70px;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 575.98px) {
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            h1, .h1 { font-size: 1.5rem; }
+            h2, .h2 { font-size: 1.4rem; }
+            h3, .h3 { font-size: 1.3rem; }
+            h4, .h4 { font-size: 1.2rem; }
+            h5, .h5 { font-size: 1.1rem; }
+            
+            .table td, .table th {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.85rem;
+            }
+            
+            /* Stack buttons in header on mobile */
+            .header-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+                margin-top: 0.5rem;
+            }
+            
+            .header-buttons .btn {
+                width: 100%;
             }
         }
         
@@ -663,6 +787,29 @@
         </div>
     </div>
 
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav d-lg-none">
+        <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
+            <i class="fas fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">
+            <i class="fas fa-boxes"></i>
+            <span>Inventaris</span>
+        </a>
+        <a href="{{ route('sales.index') }}" class="{{ request()->routeIs('sales.*') ? 'active' : '' }}">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Transaksi</span>
+        </a>
+        <a href="#" id="mobileMenuToggle">
+            <i class="fas fa-bars"></i>
+            <span>Menu</span>
+        </a>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- <footer class="py-3 mt-auto">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center">
@@ -689,34 +836,82 @@
                 });
             }, 5000);
             
-            // Sidebar toggle for mobile
+            // Elements
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
             const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            
+            // Function to show sidebar
+            function showSidebar() {
+                sidebar.style.display = 'block';
+                setTimeout(() => {
+                    sidebar.style.transform = 'translateX(0)';
+                    sidebar.classList.add('show');
+                    sidebarOverlay.classList.add('show');
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling when sidebar is open
+                }, 50);
+            }
+            
+            // Function to hide sidebar
+            function hideSidebar() {
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('show');
+                sidebarOverlay.classList.remove('show');
+                document.body.style.overflow = ''; // Re-enable scrolling
+                
+                setTimeout(function() {
+                    if (!sidebar.classList.contains('show')) {
+                        sidebar.style.display = 'none';
+                    }
+                }, 300); // Match the transition duration
+            }
+            
+            // Sidebar toggle for mobile
             if(sidebarToggle) {
                 sidebarToggle.addEventListener('click', function() {
-                    const sidebar = document.querySelector('.sidebar');
-                    
-                    // Toggle sidebar visibility
-                    sidebar.classList.toggle('show');
                     if (sidebar.classList.contains('show')) {
-                        sidebar.style.display = 'block';
-                        sidebar.style.transform = 'translateX(0)';
+                        hideSidebar();
                     } else {
-                        sidebar.style.transform = 'translateX(-100%)';
-                        setTimeout(function() {
-                            if (!sidebar.classList.contains('show')) {
-                                sidebar.style.display = 'none';
-                            }
-                        }, 300); // Match the transition duration
+                        showSidebar();
                     }
+                });
+            }
+            
+            // Mobile menu toggle
+            if(mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (sidebar.classList.contains('show')) {
+                        hideSidebar();
+                    } else {
+                        showSidebar();
+                    }
+                });
+            }
+            
+            // Close sidebar when clicking overlay
+            if(sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', hideSidebar);
+            }
+            
+            // Close sidebar when clicking a menu item (on mobile)
+            const sidebarLinks = document.querySelectorAll('.sidebar .nav-link');
+            if (window.innerWidth < 992) {
+                sidebarLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        hideSidebar();
+                    });
                 });
             }
             
             // Handle window resize
             window.addEventListener('resize', function() {
-                const sidebar = document.querySelector('.sidebar');
                 if (window.innerWidth >= 992) { // For desktop
                     sidebar.style.display = 'block';
                     sidebar.style.transform = 'translateX(0)';
+                    sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
                 } else if (!sidebar.classList.contains('show')) {
                     sidebar.style.display = 'none';
                     sidebar.style.transform = 'translateX(-100%)';
@@ -725,13 +920,65 @@
             
             // Initialize sidebar state based on screen size
             if (window.innerWidth < 992) {
-                const sidebar = document.querySelector('.sidebar');
                 sidebar.style.display = 'none';
                 sidebar.style.transform = 'translateX(-100%)';
             }
+            
+            // Add swipe gestures for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            document.addEventListener('touchstart', e => {
+                touchStartX = e.changedTouches[0].screenX;
+            }, false);
+            
+            document.addEventListener('touchend', e => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            }, false);
+            
+            function handleSwipe() {
+                const swipeThreshold = 100;
+                
+                // Swipe right to open sidebar
+                if (touchEndX - touchStartX > swipeThreshold && touchStartX < 50) {
+                    if (!sidebar.classList.contains('show')) {
+                        showSidebar();
+                    }
+                }
+                
+                // Swipe left to close sidebar
+                if (touchStartX - touchEndX > swipeThreshold && sidebar.classList.contains('show')) {
+                    hideSidebar();
+                }
+            }
+            
+            // Add active class to current page in bottom nav
+            const currentPath = window.location.pathname;
+            const bottomNavLinks = document.querySelectorAll('.mobile-bottom-nav a');
+            bottomNavLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     
     @yield('scripts')
+    
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html> 
