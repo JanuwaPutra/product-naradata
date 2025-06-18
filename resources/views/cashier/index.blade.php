@@ -78,7 +78,7 @@
                                             <th>Produk</th>
                                             <th class="text-end">Qty</th>
                                             <th class="text-end">Subtotal</th>
-                                            <th></th>
+                                            <th class="text-center" width="40">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody id="cartItems">
@@ -169,17 +169,18 @@
         
         // Update cart display
         function updateCart() {
+            // Clear current items
+            cartItems.innerHTML = '';
+            
             if (cart.length === 0) {
                 emptyCartMessage.classList.remove('d-none');
                 cartItemsContainer.classList.add('d-none');
                 processButton.disabled = true;
+                totalAmountElement.textContent = 'Rp 0';
             } else {
                 emptyCartMessage.classList.add('d-none');
                 cartItemsContainer.classList.remove('d-none');
                 processButton.disabled = false;
-                
-                // Clear current items
-                cartItems.innerHTML = '';
                 
                 // Add cart items to table
                 let total = 0;
@@ -202,7 +203,7 @@
                         </td>
                         <td class="text-end">Rp ${numberFormat(item.subtotal)}</td>
                         <td class="text-center">
-                            <button type="button" class="btn btn-sm btn-outline-danger remove-item" data-index="${index}">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-item" data-index="${index}" style="width: 32px; height: 32px; padding: 4px 0;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
