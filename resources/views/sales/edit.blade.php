@@ -23,6 +23,22 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <div class="mb-3">
+                            <label for="cashier_name" class="form-label fw-medium small">Nama Kasir <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('cashier_name') is-invalid @enderror" id="cashier_name" name="cashier_name" value="{{ old('cashier_name', $sale->cashier_name) }}" required>
+                            @error('cashier_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="customer_name" class="form-label fw-medium small">Nama Pelanggan</label>
+                            <input type="text" class="form-control @error('customer_name') is-invalid @enderror" id="customer_name" name="customer_name" value="{{ old('customer_name', $sale->customer_name) }}">
+                            @error('customer_name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="mb-3">
                             <label for="product_id" class="form-label fw-medium small">Produk <span class="text-danger">*</span></label>
                             <select class="form-select @error('product_id') is-invalid @enderror" id="product_id" name="product_id" required>
                                 <option value="">-- Pilih Produk --</option>
@@ -30,14 +46,15 @@
                                     @php
                                         // If this is the current product, use its stock + the sale quantity
                                         // Otherwise, just use its stock
-                                        $availableStock = $product->id == $sale->product_id ? 
-                                            $product->stock + $sale->quantity : 
+                                        $currentDetail = $sale->saleDetails->first();
+                                        $availableStock = ($currentDetail && $product->id == $currentDetail->product_id) ? 
+                                            $product->stock + $currentDetail->quantity : 
                                             $product->stock;
                                     @endphp
                                     <option value="{{ $product->id }}" 
                                             data-price="{{ $product->price }}" 
                                             data-stock="{{ $availableStock }}" 
-                                            {{ old('product_id', $sale->product_id) == $product->id ? 'selected' : '' }}>
+                                            {{ old('product_id', ($currentDetail ? $currentDetail->product_id : '')) == $product->id ? 'selected' : '' }}>
                                         {{ $product->name }} ({{ $availableStock }} tersedia)
                                     </option>
                                 @endforeach
@@ -49,7 +66,7 @@
                         
                         <div class="mb-3">
                             <label for="quantity" class="form-label fw-medium small">Jumlah <span class="text-danger">*</span></label>
-                            <input type="number" min="1" class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity" value="{{ old('quantity', $sale->quantity) }}" required>
+                            <input type="number" min="1" class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity" value="{{ old('quantity', ($sale->saleDetails->first() ? $sale->saleDetails->first()->quantity : 1)) }}" required>
                             <div class="form-text small">Maksimal tersedia: <span id="max-stock">0</span></div>
                             @error('quantity')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -57,9 +74,9 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="sale_date" class="form-label fw-medium small">Tanggal Penjualan <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control @error('sale_date') is-invalid @enderror" id="sale_date" name="sale_date" value="{{ old('sale_date', $sale->sale_date->format('Y-m-d')) }}" required>
-                            @error('sale_date')
+                            <label for="transaction_date" class="form-label fw-medium small">Tanggal Transaksi <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control @error('transaction_date') is-invalid @enderror" id="transaction_date" name="transaction_date" value="{{ old('transaction_date', $sale->transaction_date->format('Y-m-d')) }}" required>
+                            @error('transaction_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

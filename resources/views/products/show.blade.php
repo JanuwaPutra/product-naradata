@@ -115,7 +115,7 @@
                     </a>
                 </div>
                 <div class="card-body p-0">
-                    @if($product->sales->count() > 0)
+                    @if($product->saleDetails->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
@@ -127,12 +127,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($product->sales->sortByDesc('created_at')->take(5) as $sale)
+                                    @foreach($product->saleDetails->sortByDesc('created_at')->take(5) as $detail)
                                         <tr>
-                                            <td>{{ $sale->sale_date->format('d M Y') }}</td>
-                                            <td>{{ $sale->quantity }}</td>
-                                            <td>Rp {{ number_format($sale->price_per_item, 0, ',', '.') }}</td>
-                                            <td class="text-end fw-bold">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</td>
+                                            <td>{{ $detail->sale->transaction_date->format('d M Y') }}</td>
+                                            <td>{{ $detail->quantity }}</td>
+                                            <td>Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
+                                            <td class="text-end fw-bold">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

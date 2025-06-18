@@ -27,26 +27,28 @@ class SaleController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         
-        $query = Sale::with('product');
+        $query = Sale::with('saleDetails.product');
         
         // Apply date range filter if provided
         if (!empty($startDate)) {
-            $query->whereDate('sale_date', '>=', $startDate);
+            $query->whereDate('transaction_date', '>=', $startDate);
         }
         
         if (!empty($endDate)) {
-            $query->whereDate('sale_date', '<=', $endDate);
+            $query->whereDate('transaction_date', '<=', $endDate);
         }
         
         // Apply search filter if provided
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                $q->whereHas('product', function($subQ) use ($search) {
+                $q->whereHas('saleDetails.product', function($subQ) use ($search) {
                     $subQ->where('name', 'like', "%{$search}%");
                 })
                 ->orWhere('id', 'like', "%{$search}%")
-                ->orWhere('total_price', 'like', "%{$search}%")
-                ->orWhereRaw("DATE_FORMAT(sale_date, '%d %b %Y') LIKE ?", ["%{$search}%"]);
+                ->orWhere('total_amount', 'like', "%{$search}%")
+                ->orWhereRaw("DATE_FORMAT(transaction_date, '%d %b %Y') LIKE ?", ["%{$search}%"])
+                ->orWhere('cashier_name', 'like', "%{$search}%")
+                ->orWhere('customer_name', 'like', "%{$search}%");
             });
         }
         
@@ -105,25 +107,27 @@ class SaleController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         
-        $query = Sale::with('product');
+        $query = Sale::with('saleDetails.product');
         
         // Apply date range filter if provided
         if (!empty($startDate)) {
-            $query->whereDate('sale_date', '>=', $startDate);
+            $query->whereDate('transaction_date', '>=', $startDate);
         }
         
         if (!empty($endDate)) {
-            $query->whereDate('sale_date', '<=', $endDate);
+            $query->whereDate('transaction_date', '<=', $endDate);
         }
         
         // Apply search filter if provided
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                $q->whereHas('product', function($subQ) use ($search) {
+                $q->whereHas('saleDetails.product', function($subQ) use ($search) {
                     $subQ->where('name', 'like', "%{$search}%");
                 })
                 ->orWhere('id', 'like', "%{$search}%")
-                ->orWhere('total_price', 'like', "%{$search}%");
+                ->orWhere('total_amount', 'like', "%{$search}%")
+                ->orWhere('cashier_name', 'like', "%{$search}%")
+                ->orWhere('customer_name', 'like', "%{$search}%");
             });
         }
         
@@ -254,7 +258,9 @@ class SaleController extends Controller
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-            'sale_date' => 'required|date',
+            'transaction_date' => 'required|date',
+            'cashier_name' => 'required|string|max:255',
+            'customer_name' => 'nullable|string|max:255',
         ]);
         
         // Get the product
@@ -266,8 +272,8 @@ class SaleController extends Controller
         }
         
         // Calculate prices
-        $price_per_item = $product->price;
-        $total_price = $price_per_item * $validated['quantity'];
+        $price = $product->price;
+        $subtotal = $price * $validated['quantity'];
         
         try {
             // Simpan stok awal untuk logging
@@ -275,13 +281,20 @@ class SaleController extends Controller
             
             DB::beginTransaction();
             
-            // Create sale record
+            // Create sale record - ensure cashier_name and customer_name are strings
             $sale = Sale::create([
+                'cashier_name' => (string)$validated['cashier_name'],
+                'customer_name' => !empty($validated['customer_name']) ? (string)$validated['customer_name'] : 'Guest',
+                'transaction_date' => $validated['transaction_date'],
+                'total_amount' => $subtotal,
+            ]);
+            
+            // Create sale detail
+            $sale->saleDetails()->create([
                 'product_id' => $validated['product_id'],
                 'quantity' => $validated['quantity'],
-                'price_per_item' => $price_per_item,
-                'total_price' => $total_price,
-                'sale_date' => $validated['sale_date'],
+                'price' => $price,
+                'subtotal' => $subtotal,
             ]);
             
             // Update product stock - pastikan stok berkurang
@@ -311,6 +324,7 @@ class SaleController extends Controller
      */
     public function show(Sale $sale)
     {
+        $sale->load('saleDetails.product');
         return view('sales.show', compact('sale'));
     }
 
@@ -319,6 +333,7 @@ class SaleController extends Controller
      */
     public function edit(Sale $sale)
     {
+        $sale->load('saleDetails.product');
         $products = Product::all();
         return view('sales.edit', compact('sale', 'products'));
     }
@@ -331,11 +346,20 @@ class SaleController extends Controller
         $validated = $request->validate([
             'product_id' => 'required|exists:products,id',
             'quantity' => 'required|integer|min:1',
-            'sale_date' => 'required|date',
+            'transaction_date' => 'required|date',
+            'cashier_name' => 'required|string|max:255',
+            'customer_name' => 'nullable|string|max:255',
         ]);
         
-        $originalQuantity = $sale->quantity;
-        $originalProductId = $sale->product_id;
+        // For simplicity, we'll assume only one product per sale in this update method
+        $saleDetail = $sale->saleDetails->first();
+        
+        if (!$saleDetail) {
+            return back()->withInput()->withErrors(['error' => 'Detail penjualan tidak ditemukan.']);
+        }
+        
+        $originalQuantity = $saleDetail->quantity;
+        $originalProductId = $saleDetail->product_id;
         
         // Get the new product
         $newProduct = Product::findOrFail($validated['product_id']);
@@ -404,26 +428,33 @@ class SaleController extends Controller
             }
             
             // Calculate prices
-            $price_per_item = $newProduct->price;
-            $total_price = $price_per_item * $validated['quantity'];
+            $price = $newProduct->price;
+            $subtotal = $price * $validated['quantity'];
             
-            // Update sale record
-            $sale->update([
+            // Update sale detail
+            $saleDetail->update([
                 'product_id' => $validated['product_id'],
                 'quantity' => $validated['quantity'],
-                'price_per_item' => $price_per_item,
-                'total_price' => $total_price,
-                'sale_date' => $validated['sale_date'],
+                'price' => $price,
+                'subtotal' => $subtotal,
+            ]);
+            
+            // Update sale record - ensure cashier_name and customer_name are strings
+            $sale->update([
+                'cashier_name' => (string)$validated['cashier_name'],
+                'customer_name' => !empty($validated['customer_name']) ? (string)$validated['customer_name'] : 'Guest',
+                'transaction_date' => $validated['transaction_date'],
+                'total_amount' => $subtotal,
             ]);
             
             DB::commit();
             
             return redirect()->route('sales.show', $sale)
-                ->with('success', 'Penjualan berhasil diperbarui dan stok produk telah diperbarui.');
+                ->with('success', 'Data penjualan berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Error saat memperbarui penjualan: ' . $e->getMessage());
-            return back()->withInput()->withErrors(['error' => $e->getMessage()]);
+            return back()->withInput()->withErrors(['error' => 'Terjadi kesalahan saat memperbarui penjualan: ' . $e->getMessage()]);
         }
     }
 
@@ -435,20 +466,18 @@ class SaleController extends Controller
         try {
             DB::beginTransaction();
             
-            // Restore stock to product
-            $product = Product::findOrFail($sale->product_id);
-            $initialStock = $product->stock;
+            // Return stock for each sale detail
+            foreach ($sale->saleDetails as $detail) {
+                $product = Product::findOrFail($detail->product_id);
+                $product->stock += $detail->quantity;
+                $product->save();
+                
+                \Log::info('Mengembalikan stok saat hapus penjualan: ID Produk=' . $product->id . 
+                           ', Jumlah Dikembalikan=' . $detail->quantity . 
+                           ', Stok Akhir=' . $product->stock);
+            }
             
-            $product->stock = $product->stock + $sale->quantity;
-            $product->save();
-            
-            \Log::info('Mengembalikan stok karena penjualan dihapus: ID Produk=' . $product->id . 
-                       ', Nama=' . $product->name . 
-                       ', Stok Awal=' . $initialStock . 
-                       ', Jumlah Dikembalikan=' . $sale->quantity . 
-                       ', Stok Akhir=' . $product->stock);
-            
-            // Delete sale record
+            // Delete the sale (will cascade to sale details)
             $sale->delete();
             
             DB::commit();

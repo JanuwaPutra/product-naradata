@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\CashierController;
 use Illuminate\Support\Facades\Route;
 
 // Dashboard route
@@ -23,3 +24,8 @@ Route::get('sales-export-pdf', [SaleController::class, 'exportPdf'])->name('sale
 Route::get('sales-import', [SaleController::class, 'importForm'])->name('sales.import.form');
 Route::post('sales-import', [SaleController::class, 'import'])->name('sales.import');
 Route::get('sales-template', [SaleController::class, 'downloadTemplate'])->name('sales.template');
+
+// Cashier routes
+Route::get('cashier', [CashierController::class, 'index'])->name('cashier.index');
+Route::post('cashier/process', [CashierController::class, 'processSale'])->name('cashier.process');
+Route::get('cashier/receipt/{id}', [CashierController::class, 'showReceipt'])->name('cashier.receipt');

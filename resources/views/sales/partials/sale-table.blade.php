@@ -1,16 +1,29 @@
 @forelse($sales as $sale)
     <tr>
-        <td>{{ $sale->sale_date->format('d M Y') }}</td>
+        <td>{{ $sale->transaction_date->format('d M Y') }}</td>
         <td>
-            <a href="{{ route('products.show', $sale->product) }}" class="text-decoration-none fw-medium text-dark">
-                {{ $sale->product->name }}
-            </a>
+            @if($sale->saleDetails->isNotEmpty())
+                <a href="{{ route('products.show', $sale->saleDetails->first()->product) }}" class="text-decoration-none fw-medium text-dark">
+                    {{ $sale->saleDetails->first()->product->name }}
+                </a>
+                @if($sale->saleDetails->count() > 1)
+                    <span class="badge bg-info text-white ms-1">+{{ $sale->saleDetails->count() - 1 }}</span>
+                @endif
+            @else
+                <span class="text-muted">Produk tidak tersedia</span>
+            @endif
         </td>
-        <td class="text-center">{{ $sale->quantity }}</td>
+        <td class="text-center">
+            @if($sale->saleDetails->isNotEmpty())
+                {{ $sale->saleDetails->sum('quantity') }}
+            @else
+                0
+            @endif
+        </td>
         <td>
-            <span class="fw-semibold small">Rp {{ number_format($sale->price_per_item, 0, ',', '.') }}</span>
+            <span class="fw-semibold small">{{ $sale->cashier_name }}</span>
         </td>
-        <td class="text-end fw-bold">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</td>
+        <td class="text-end fw-bold">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
         <td>
             <div class="d-flex gap-1 justify-content-center">
                 <a href="{{ route('sales.show', $sale) }}" class="btn btn-sm btn-outline-primary btn-xs" data-bs-toggle="tooltip" title="Lihat Detail">

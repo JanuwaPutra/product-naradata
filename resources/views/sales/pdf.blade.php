@@ -62,10 +62,10 @@
         <thead>
             <tr>
                 <th width="5%" class="text-center">ID</th>
-                <th width="15%">Tanggal</th>
-                <th width="30%">Nama Barang</th>
-                <th width="10%" class="text-center">Jumlah</th>
-                <th width="20%">Harga Satuan</th>
+                <th width="12%">Tanggal</th>
+                <th width="15%">Kasir</th>
+                <th width="15%">Pelanggan</th>
+                <th width="33%">Produk</th>
                 <th width="20%" class="text-right">Total</th>
             </tr>
         </thead>
@@ -73,11 +73,16 @@
             @forelse($sales as $sale)
                 <tr>
                     <td class="text-center">{{ $sale->id }}</td>
-                    <td>{{ $sale->sale_date->format('d/m/Y') }}</td>
-                    <td>{{ $sale->product->name }}</td>
-                    <td class="text-center">{{ $sale->quantity }}</td>
-                    <td>Rp {{ number_format($sale->price_per_item, 0, ',', '.') }}</td>
-                    <td class="text-right">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</td>
+                    <td>{{ $sale->transaction_date->format('d/m/Y') }}</td>
+                    <td>{{ $sale->cashier_name }}</td>
+                    <td>{{ $sale->customer_name }}</td>
+                    <td>
+                        @foreach($sale->saleDetails as $detail)
+                            {{ $detail->product->name }} ({{ $detail->quantity }})
+                            @if(!$loop->last), @endif
+                        @endforeach
+                    </td>
+                    <td class="text-right">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>
@@ -88,7 +93,7 @@
             @if($sales->isNotEmpty())
                 <tr class="total-row">
                     <td colspan="5" class="text-right">Total:</td>
-                    <td class="text-right">Rp {{ number_format($sales->sum('total_price'), 0, ',', '.') }}</td>
+                    <td class="text-right">Rp {{ number_format($sales->sum('total_amount'), 0, ',', '.') }}</td>
                 </tr>
             @endif
         </tbody>

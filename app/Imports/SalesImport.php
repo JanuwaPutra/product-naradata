@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Sale;
+use App\Models\SaleDetail;
 use App\Models\Product;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -42,16 +43,24 @@ class SalesImport implements ToCollection, WithHeadingRow, WithValidation, WithB
                 }
                 
                 // Calculate price
-                $pricePerItem = $product->price;
-                $totalPrice = $pricePerItem * $row['jumlah'];
+                $price = $product->price;
+                $subtotal = $price * $row['jumlah'];
                 
                 // Create sale record
                 $sale = Sale::create([
+                    'cashier_name' => 'Import',
+                    'customer_name' => 'Import',
+                    'transaction_date' => Carbon::parse($row['tanggal'])->format('Y-m-d'),
+                    'total_amount' => $subtotal,
+                ]);
+                
+                // Create sale detail
+                $saleDetail = SaleDetail::create([
+                    'sale_id' => $sale->id,
                     'product_id' => $product->id,
                     'quantity' => $row['jumlah'],
-                    'price_per_item' => $pricePerItem,
-                    'total_price' => $totalPrice,
-                    'sale_date' => Carbon::parse($row['tanggal'])->format('Y-m-d'),
+                    'price' => $price,
+                    'subtotal' => $subtotal,
                 ]);
                 
                 // Update product stock

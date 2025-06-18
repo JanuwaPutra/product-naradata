@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Sale extends Model
 {
     use HasFactory;
     
     protected $fillable = [
-        'product_id',
-        'quantity',
-        'price_per_item',
-        'total_price',
-        'sale_date'
+        'cashier_name',
+        'customer_name',
+        'transaction_date',
+        'total_amount'
     ];
     
     /**
@@ -24,14 +24,14 @@ class Sale extends Model
      * @var array
      */
     protected $casts = [
-        'sale_date' => 'datetime',
+        'transaction_date' => 'datetime',
     ];
     
     /**
-     * Get the product that owns the sale.
+     * Get the sale details for this sale.
      */
-    public function product(): BelongsTo
+    public function saleDetails(): HasMany
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(SaleDetail::class);
     }
 }

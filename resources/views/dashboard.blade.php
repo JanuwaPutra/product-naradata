@@ -209,17 +209,24 @@
                                 @forelse($recentSales as $sale)
                                     <tr>
                                         <td>
-                                            <span class="badge bg-light text-dark border small">{{ $sale->sale_date->format('d M Y') }}</span>
+                                            <span class="badge bg-light text-dark border small">{{ $sale->transaction_date->format('d M Y') }}</span>
                                         </td>
                                         <td>
-                                            <a href="{{ route('products.show', $sale->product) }}" class="text-decoration-none fw-medium text-dark small">
-                                                {{ $sale->product->name }}
-                                            </a>
+                                            @if($sale->saleDetails->isNotEmpty())
+                                                <a href="{{ route('products.show', $sale->saleDetails->first()->product) }}" class="text-decoration-none fw-medium text-dark small">
+                                                    {{ $sale->saleDetails->first()->product->name }}
+                                                </a>
+                                                @if($sale->saleDetails->count() > 1)
+                                                    <span class="badge bg-info text-white ms-1">+{{ $sale->saleDetails->count() - 1 }}</span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted small">Produk tidak tersedia</span>
+                                            @endif
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary-subtle text-primary rounded-pill small">{{ $sale->quantity }}</span>
+                                            <span class="badge bg-primary-subtle text-primary rounded-pill small">{{ $sale->saleDetails->sum('quantity') }}</span>
                                         </td>
-                                        <td class="text-end fw-bold small">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</td>
+                                        <td class="text-end fw-bold small">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
                                     </tr>
                                 @empty
                                     <tr>

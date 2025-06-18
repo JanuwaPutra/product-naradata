@@ -26,49 +26,55 @@
                             <h5 class="fw-bold">Penjualan #{{ $sale->id }}</h5>
                         </div>
                         <div class="col-md-6 text-end">
-                            <span class="badge bg-primary">{{ $sale->sale_date->format('d F Y') }}</span>
+                            <span class="badge bg-primary">{{ $sale->transaction_date->format('d F Y') }}</span>
                         </div>
                     </div>
 
                     <hr class="my-3">
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <strong class="small">Produk:</strong>
-                            <p class="mb-0">
-                                <a href="{{ route('products.show', $sale->product) }}" class="text-decoration-none">
-                                    {{ $sale->product->name }}
-                                </a>
-                            </p>
+                    <div class="row mb-3">
+                        <div class="col-md-6 mb-2">
+                            <strong class="small">Kasir:</strong>
+                            <p class="mb-0">{{ $sale->cashier_name }}</p>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <strong class="small">Stok Saat Ini:</strong>
-                            <p class="mb-0">
-                                @if($sale->product->stock > 10)
-                                    <span class="badge bg-success-subtle text-success">{{ $sale->product->stock }} tersedia</span>
-                                @elseif($sale->product->stock > 0)
-                                    <span class="badge bg-warning-subtle text-warning">{{ $sale->product->stock }} tersisa (Stok Menipis)</span>
-                                @else
-                                    <span class="badge bg-danger-subtle text-danger">Habis</span>
-                                @endif
-                            </p>
+                        <div class="col-md-6 mb-2">
+                            <strong class="small">Pelanggan:</strong>
+                            <p class="mb-0">{{ $sale->customer_name }}</p>
                         </div>
+                    </div>
 
-                        <div class="col-md-4 mb-3">
-                            <strong class="small">Jumlah Terjual:</strong>
-                            <p class="mb-0">{{ $sale->quantity }}</p>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <strong class="small">Harga Per Item:</strong>
-                            <p class="mb-0">Rp {{ number_format($sale->price_per_item, 0, ',', '.') }}</p>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <strong class="small">Total:</strong>
-                            <p class="mb-0 fw-bold">Rp {{ number_format($sale->total_price, 0, ',', '.') }}</p>
-                        </div>
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Produk</th>
+                                    <th class="text-center">Jumlah</th>
+                                    <th class="text-end">Harga</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($sale->saleDetails as $detail)
+                                <tr>
+                                    <td>
+                                        <a href="{{ route('products.show', $detail->product) }}" class="text-decoration-none">
+                                            {{ $detail->product->name }}
+                                        </a>
+                                    </td>
+                                    <td class="text-center">{{ $detail->quantity }}</td>
+                                    <td class="text-end">Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
+                                    <td class="text-end">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Total:</th>
+                                    <th class="text-end">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
 
                     <hr class="my-3">
@@ -76,7 +82,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <strong class="small">Tanggal Penjualan:</strong>
-                            <p class="mb-0">{{ $sale->sale_date->format('d F Y') }}</p>
+                            <p class="mb-0">{{ $sale->transaction_date->format('d F Y') }}</p>
                         </div>
 
                         <div class="col-md-6 mb-3">
@@ -102,9 +108,11 @@
                             <a href="{{ route('sales.edit', $sale) }}" class="btn btn-warning btn-sm me-1">
                                 <i class="fas fa-edit me-1"></i> Edit
                             </a>
-                            <a href="{{ route('products.show', $sale->product) }}" class="btn btn-primary btn-sm">
+                            @if($sale->saleDetails->isNotEmpty())
+                            <a href="{{ route('products.show', $sale->saleDetails->first()->product) }}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-box me-1"></i> Lihat Produk
                             </a>
+                            @endif
                         </div>
                     </div>
                 </div>

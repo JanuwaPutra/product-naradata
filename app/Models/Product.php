@@ -18,10 +18,25 @@ class Product extends Model
     ];
     
     /**
-     * Get the sales for the product.
+     * Get the sale details for the product.
      */
-    public function sales(): HasMany
+    public function saleDetails(): HasMany
     {
-        return $this->hasMany(Sale::class);
+        return $this->hasMany(SaleDetail::class);
+    }
+    
+    /**
+     * Get the sales for the product through sale details.
+     */
+    public function sales()
+    {
+        return $this->hasManyThrough(
+            Sale::class,
+            SaleDetail::class,
+            'product_id', // Foreign key on SaleDetail table
+            'id', // Foreign key on Sale table (primary key)
+            'id', // Local key on Product table (primary key)
+            'sale_id' // Local key on SaleDetail table
+        );
     }
 }

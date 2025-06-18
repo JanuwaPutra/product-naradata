@@ -717,6 +717,11 @@
                                 <i class="fas fa-exchange-alt"></i> Transaksi
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('cashier.*') ? 'active' : '' }}" href="{{ route('cashier.index') }}">
+                                <i class="fas fa-cash-register"></i> Kasir
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 
@@ -805,6 +810,10 @@
         <a href="{{ route('sales.index') }}" class="{{ request()->routeIs('sales.*') ? 'active' : '' }}">
             <i class="fas fa-exchange-alt"></i>
             <span>Transaksi</span>
+        </a>
+        <a href="{{ route('cashier.index') }}" class="{{ request()->routeIs('cashier.*') ? 'active' : '' }}">
+            <i class="fas fa-cash-register"></i>
+            <span>Kasir</span>
         </a>
         <a href="#" id="mobileMenuToggle">
             <i class="fas fa-bars"></i>

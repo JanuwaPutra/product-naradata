@@ -28,25 +28,27 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     */
     public function collection()
     {
-        $query = Sale::with('product');
+        $query = Sale::with('saleDetails.product');
         
         // Apply date range filter if provided
         if (!empty($this->startDate)) {
-            $query->whereDate('sale_date', '>=', $this->startDate);
+            $query->whereDate('transaction_date', '>=', $this->startDate);
         }
         
         if (!empty($this->endDate)) {
-            $query->whereDate('sale_date', '<=', $this->endDate);
+            $query->whereDate('transaction_date', '<=', $this->endDate);
         }
         
         // Apply search filter if provided
         if (!empty($this->search)) {
             $query->where(function($q) {
-                $q->whereHas('product', function($subQ) {
+                $q->whereHas('saleDetails.product', function($subQ) {
                     $subQ->where('name', 'like', "%{$this->search}%");
                 })
                 ->orWhere('id', 'like', "%{$this->search}%")
-                ->orWhere('total_price', 'like', "%{$this->search}%");
+                ->orWhere('total_amount', 'like', "%{$this->search}%")
+                ->orWhere('cashier_name', 'like', "%{$this->search}%")
+                ->orWhere('customer_name', 'like', "%{$this->search}%");
             });
         }
         
@@ -61,9 +63,10 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         return [
             'ID',
             'Tanggal',
-            'Nama Barang',
-            'Jumlah',
-            'Harga Satuan',
+            'Kasir',
+            'Pelanggan',
+            'Produk',
+            'Jumlah Item',
             'Total',
         ];
     }
@@ -74,13 +77,22 @@ class SalesExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
      */
     public function map($row): array
     {
+        // Get product names
+        $products = $row->saleDetails->map(function($detail) {
+            return $detail->product->name . ' (' . $detail->quantity . ')';
+        })->join(', ');
+        
+        // Get total items
+        $totalItems = $row->saleDetails->sum('quantity');
+        
         return [
             $row->id,
-            $row->sale_date->format('d/m/Y'),
-            $row->product->name,
-            $row->quantity,
-            'Rp ' . number_format($row->price_per_item, 0, ',', '.'),
-            'Rp ' . number_format($row->total_price, 0, ',', '.'),
+            $row->transaction_date->format('d/m/Y'),
+            $row->cashier_name,
+            $row->customer_name,
+            $products,
+            $totalItems,
+            'Rp ' . number_format($row->total_amount, 0, ',', '.'),
         ];
     }
     

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\SaleDetail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,23 +20,23 @@ class DashboardController extends Controller
         $lowStockProducts = Product::where('stock', '<', 10)->count();
         
         // Total sales today
-        $todaySales = Sale::whereDate('sale_date', Carbon::today())->sum('total_price');
+        $todaySales = Sale::whereDate('transaction_date', Carbon::today())->sum('total_amount');
         
         // Total sales this month
-        $thisMonthSales = Sale::whereYear('sale_date', Carbon::now()->year)
-                             ->whereMonth('sale_date', Carbon::now()->month)
-                             ->sum('total_price');
+        $thisMonthSales = Sale::whereYear('transaction_date', Carbon::now()->year)
+                             ->whereMonth('transaction_date', Carbon::now()->month)
+                             ->sum('total_amount');
         
         // Top selling products
-        $topSellingProducts = Product::select('products.id', 'products.name', DB::raw('SUM(sales.quantity) as total_sold'))
-                                    ->leftJoin('sales', 'products.id', '=', 'sales.product_id')
+        $topSellingProducts = Product::select('products.id', 'products.name', DB::raw('SUM(sale_details.quantity) as total_sold'))
+                                    ->leftJoin('sale_details', 'products.id', '=', 'sale_details.product_id')
                                     ->groupBy('products.id', 'products.name')
                                     ->orderBy('total_sold', 'desc')
                                     ->take(5)
                                     ->get();
         
         // Recent sales
-        $recentSales = Sale::with('product')->latest()->take(5)->get();
+        $recentSales = Sale::with('saleDetails.product')->latest()->take(5)->get();
         
         // Weekly sales data for chart (last 7 days)
         $weeklySalesData = $this->getWeeklySalesData();
@@ -67,8 +68,8 @@ class DashboardController extends Controller
         $days = collect(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
         
         // Get sales for the last 7 days
-        $salesData = Sale::selectRaw('DATE(sale_date) as date, SUM(total_price) as total')
-            ->where('sale_date', '>=', Carbon::now()->subDays(7))
+        $salesData = Sale::selectRaw('DATE(transaction_date) as date, SUM(total_amount) as total')
+            ->where('transaction_date', '>=', Carbon::now()->subDays(7))
             ->groupBy('date')
             ->orderBy('date')
             ->get()
@@ -98,8 +99,8 @@ class DashboardController extends Controller
         $months = collect(['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des']);
         
         // Get sales for the last 12 months
-        $salesData = Sale::selectRaw('MONTH(sale_date) as month, YEAR(sale_date) as year, SUM(total_price) as total')
-            ->where('sale_date', '>=', Carbon::now()->subMonths(12))
+        $salesData = Sale::selectRaw('MONTH(transaction_date) as month, YEAR(transaction_date) as year, SUM(total_amount) as total')
+            ->where('transaction_date', '>=', Carbon::now()->subMonths(12))
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')
